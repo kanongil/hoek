@@ -1096,6 +1096,52 @@ describe('deepEqual()', () => {
         expect(Hoek.deepEqual(a, b)).to.be.true();
     });
 
+    it('handles obj only circular dependency', () => {
+
+        const a = {};
+        a.x = a;
+
+        const b = { x: {} };
+        expect(Hoek.deepEqual(a, b)).to.be.false();
+        expect(Hoek.deepEqual(b, a)).to.be.false();
+    });
+
+    it('handles irregular circular dependency', () => {
+
+        const a = {};
+        a.x = a;
+
+        const b = { x: {} };
+        b.x.x = b;
+
+        const c = { x: { x: {} } };
+        c.x.x.x = c;
+        expect(Hoek.deepEqual(a, b)).to.be.true();
+        expect(Hoek.deepEqual(b, a)).to.be.true();
+        expect(Hoek.deepEqual(a, c)).to.be.true();
+        expect(Hoek.deepEqual(b, c)).to.be.true();
+        expect(Hoek.deepEqual(c, a)).to.be.true();
+        expect(Hoek.deepEqual(c, b)).to.be.true();
+        b.x.y = 1;
+        expect(Hoek.deepEqual(a, b)).to.be.false();
+        expect(Hoek.deepEqual(b, a)).to.be.false();
+    });
+
+    it('handles cross circular dependency', () => {
+
+        const a = {};
+        const b = { x: {}, y: a };
+        b.x.x = b;
+        b.x.y = b.x;
+        a.x = b;
+        a.y = a;
+        expect(Hoek.deepEqual(b, a)).to.be.true();
+        expect(Hoek.deepEqual(a, b)).to.be.true();
+        b.x.y = 1;
+        expect(Hoek.deepEqual(b, a)).to.be.false();
+        expect(Hoek.deepEqual(a, b)).to.be.false();
+    });
+
     it('handles reuse of objects', () => {
 
         const date1 = { year: 2018, month: 1, day: 1 };
