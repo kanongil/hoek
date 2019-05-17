@@ -192,6 +192,7 @@ expect.error(Hoek.reach('abc', '0'));
 expect.error(Hoek.reach([0], 0));
 expect.error(Hoek.reach(['abc'], '0', { unknown: false }));
 expect.error(Hoek.reach(['abc'], '0', { separator: false }));
+expect.error(Hoek.reach(['abc'], [0], { separator: '/' }));
 
 
 // reachTemplate()

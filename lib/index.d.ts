@@ -77,7 +77,8 @@ Merge all the properties of source into target.
 
 @returns The `target` object.
 */
-export function merge<T1 extends object, T2 extends object>(target: T1, source: T2, isNullOverride?: boolean, isMergeArrays?: boolean): T1 & T2;
+export function merge<T extends object, S extends object>(target: T, source: S, isNullOverride?: boolean, isMergeArrays?: boolean): T & S;
+export function merge<T extends object, S extends object>(target: T, source: null | undefined, isNullOverride?: boolean, isMergeArrays?: boolean): T;
 
 
 /**
@@ -89,7 +90,7 @@ Apply options to a copy of the defaults.
 
 @returns A copy of `defaults` with `options` keys overriding any conflicts.
 */
-export function applyToDefaults<T extends object>(defaults: Partial<T>, options: Partial<T> | boolean | null, isNullOverride?: boolean): Partial<T>;
+export function applyToDefaults<T extends object>(defaults: Partial<T>, options: Partial<T> | boolean | null | undefined, isNullOverride?: boolean): Partial<T>;
 
 
 /**
@@ -100,7 +101,7 @@ Clone an object or array with specific keys shallowly cloned.
 
 @returns A deep clone of `obj` with the requested `keys` shallowly cloned.
 */
-export function cloneWithShallow<T>(obj: T, keys: string[], options?: clone.Options): T;
+export function cloneWithShallow<T>(obj: T, keys: reach.AnyLink[], options?: clone.Options): T;
 
 
 /**
@@ -112,7 +113,7 @@ Apply options to a copy of the defaults with specific keys shallowly cloned.
 
 @returns A copy of `defaults` with `options` keys overriding any conflicts.
 */
-export function applyToDefaultsWithShallow<T extends object>(defaults: Partial<T>, options: Partial<T> | boolean | null, keys: string[]): Partial<T>;
+export function applyToDefaultsWithShallow<T extends object>(defaults: Partial<T>, options: Partial<T> | boolean | null | undefined, keys: reach.AnyLink[]): Partial<T>;
 
 
 /**
@@ -142,7 +143,7 @@ Checks if the reference value contains the provided values.
 @return true if the value contains the provided values, otherwise false.
 */
 export function contain(ref: string, values: string | string[], options?: contain.Options): boolean;
-export function contain(ref: any[], values: any, options?: contain.Options): boolean;
+export function contain<T>(ref: T[], values: T | T[], options?: contain.Options): boolean;
 export function contain(ref: object, values: string | string[] | object, options?: contain.Options): boolean;
 
 declare namespace contain {
@@ -206,18 +207,12 @@ Convert an object key chain string to reference.
 
 @return The value referenced by the chain if found, otherwise undefined. If chain is null, undefined, or false, the object itself will be returned.
 */
-export function reach(obj: object | null, chain: string | (string | number)[] | false | null | undefined, options?: reach.Options): any;
+export function reach(obj: object | Function | null, chain: string | false | null | undefined, options?: reach.Options): any;
+export function reach(obj: object | Function | null, chain: reach.ArrayLink, options?: reach.BaseOptions): any;
 
 declare namespace reach {
 
-    interface Options {
-
-        /**
-        String to split chain path on. Defaults to '.'.
-
-        @default false
-        */
-        readonly separator?: string;
+    interface BaseOptions {
 
         /**
         Value to return if the path or value is not present. No default value.
@@ -240,6 +235,20 @@ declare namespace reach {
         */
         readonly functions?: boolean;
     }
+
+    interface Options extends BaseOptions {
+
+        /**
+        String to split chain path on. Defaults to '.'.
+
+        @default false
+        */
+        readonly separator?: string;
+    }
+
+    type ArrayLink = PropertyKey[];
+
+    type AnyLink = string | ArrayLink;
 }
 
 
@@ -251,7 +260,7 @@ Replace string parameters (using format "{path.to.key}") with their correspondin
 
 @return The template string with the {} enclosed keys replaced with looked-up values.
 */
-export function reachTemplate(obj: object | null, template: string, options?: reach.Options): string;
+export function reachTemplate(obj: object | Function | null, template: string, options?: reach.Options): string;
 
 
 /**
@@ -262,7 +271,7 @@ Throw an error if condition is falsey.
 
 @return Does not return a value but throws if the `condition` is falsey.
 */
-export function assert(condition: any, error: Error): void;
+export function assert(condition: any, error: Error): void | never;
 
 
 /**
@@ -273,7 +282,7 @@ Throw an error if condition is falsey.
 
 @return Does not return a value but throws if the `condition` is falsey.
 */
-export function assert(condition: any, ...args: any): void;
+export function assert(condition: any, ...args: any): void | never;
 
 
 /**
@@ -344,7 +353,7 @@ Wraps a function to ensure it can only execute once.
 
 @return The wrapped function.
  */
-export function once<T extends Function>(method: T): T;
+export function once<T extends (...args: any) => any>(fn: T): ((...args: Parameters<T>) => void);
 
 
 /**
@@ -389,4 +398,4 @@ export function wait(timeout?: number): Promise<void>;
 /**
 Returns a Promise that never resolves.
 */
-export function block(): Promise<void>;
+export function block(): Promise<never>;
