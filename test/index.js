@@ -2382,6 +2382,32 @@ describe('wait()', () => {
         await expect(() => Hoek.wait(Symbol('hi'))).to.throw();
         await expect(() => Hoek.wait(BigInt(10))).to.throw();
     });
+
+    it('supports cancel signal', async () => {
+
+        const ac = new AbortController();
+        const wait = Hoek.wait(10, null, { signal: ac.signal });
+
+        await Hoek.wait();
+        ac.abort();
+
+        const err = await expect(Promise.race([wait, Hoek.wait(10)])).to.reject();
+
+        expect(err.code).to.equal('ABORT_ERR');
+        expect(err.name).to.equal('AbortError');
+    });
+
+    it('handles an already cancelled signal', async () => {
+
+        const ac = new AbortController();
+        ac.abort();
+
+        const wait = Hoek.wait(10, null, { signal: ac.signal });
+        const err = await expect(Promise.race([wait, Hoek.wait(10)])).to.reject();
+
+        expect(err.code).to.equal('ABORT_ERR');
+        expect(err.name).to.equal('AbortError');
+    });
 });
 
 describe('block()', () => {
