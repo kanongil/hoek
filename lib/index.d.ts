@@ -347,17 +347,11 @@ export class Bench {
 
     constructor();
 
-    /** The starting timestamp expressed in the number of milliseconds since the epoch. */
-    ts: number;
-
-    /** The time in milliseconds since the object was created. */
+    /** The time in milliseconds since the object was created or last reset. */
     elapsed(): number;
 
-    /** Reset the `ts` value to now. */
+    /** Reset the reference value to now. */
     reset(): void;
-
-    /** The current time in milliseconds since the epoch. */
-    static now(): number;
 }
 
 

@@ -211,15 +211,12 @@ expect.type<void>(Hoek.assert(true));
 // Bench
 
 const bench = new Hoek.Bench();
-expect.type<number>(bench.ts);
 expect.type<void>(bench.reset());
 expect.type<number>(bench.elapsed());
-expect.type<number>(Hoek.Bench.now());
 
 expect.error(new Hoek.Bench({}));
 expect.error(bench.reset(true));
 expect.error(bench.elapsed(true));
-expect.error(Hoek.Bench.now(true));
 
 
 // escapeRegex()
