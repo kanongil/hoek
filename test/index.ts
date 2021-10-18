@@ -205,6 +205,10 @@ Hoek.assert(true, 'some', 'message', 10);
 Hoek.assert(1, 'error');
 Hoek.assert(true, new Error('message'));
 
+const fail = false as boolean;
+Hoek.assert(!fail);             // Narrows 'fail' type
+expect.type<false>(fail);
+
 expect.type<void>(Hoek.assert(true));
 
 
